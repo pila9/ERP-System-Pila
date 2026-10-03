@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Laravel
+backend/.env
+backend/storage/logs/*
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/*.key
+backend/bootstrap/cache/*.php
+backend/public/storage
+backend/public/hot
+backend/public/build
+
+# Frontend
+frontend/dist
+frontend/.vite
+frontend/node_modules
+
+# Env / local
+.env
+.env.local
+docker-compose.override.yml
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Tests
+coverage/
+.phpunit.result.cache

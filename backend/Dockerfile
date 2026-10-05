@@ -61,6 +61,7 @@ COPY --from=vendor /tmp/skel/public /var/www/html/public
 COPY . /var/www/html
 
 RUN cp -n /var/www/html/.env.example /var/www/html/.env || true \
+    && cp /var/www/html/docker/php-fpm.conf /usr/local/etc/php-fpm.d/zz-app.conf \
     && mkdir -p /var/www/html/storage/framework/{cache/data,sessions,views,testing} \
              /var/www/html/storage/app/{public,private} \
              /var/www/html/storage/logs \

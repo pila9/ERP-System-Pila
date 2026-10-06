@@ -1,9 +1,10 @@
 {
-  "buildCommand": "cd frontend && npm ci && npm run build",
-  "outputDirectory": "frontend/dist",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
@@ -17,8 +18,5 @@
         }
       ]
     }
-  ],
-  "env": {
-    "VITE_API_URL": "REPLACE_WITH_YOUR_API_URL"
-  }
+  ]
 }

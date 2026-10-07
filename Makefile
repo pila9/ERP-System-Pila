@@ -12,7 +12,6 @@ up: ## Build images and start the whole stack (db + api + web)
 	$(COMPOSE) up -d --build
 	@echo ""
 	@echo "  App  -> http://localhost:$${WEB_PORT:-8080}"
-	@echo "  Mail -> admin@erp.test / password"
 
 .PHONY: dev
 dev: ## Start stack with Vite dev server + HMR (http://localhost:5173)
@@ -33,7 +32,7 @@ logs: ## Tail logs from all services
 	$(COMPOSE) logs -f
 
 .PHONY: api-logs
-api-logs: ## Tail API (php-fpm) logs
+api-logs: ## Tail API (node) logs
 	$(COMPOSE) logs -f api
 
 .PHONY: ps
@@ -44,21 +43,18 @@ ps: ## Show container status
 shell: ## Open a bash shell inside the API container
 	$(COMPOSE) --profile tools run --rm shell
 
-.PHONY: artisan
-artisan: ## Run artisan in the API container (make artisan migrate)
-	$(COMPOSE) exec api php artisan $(ARGS)
-
 .PHONY: migrate
 migrate: ## Run database migrations
-	$(COMPOSE) exec api php artisan migrate --force
+	$(COMPOSE) exec api npx prisma migrate deploy
 
 .PHONY: migrate-fresh
 migrate-fresh: ## Drop all tables, re-migrate and re-seed demo data
-	$(COMPOSE) exec api php artisan migrate:fresh --seed --force
+	$(COMPOSE) exec api npx prisma migrate reset --force
+	$(COMPOSE) exec api npx prisma db seed
 
 .PHONY: seed
 seed: ## Seed demo data
-	$(COMPOSE) exec api php artisan db:seed --force
+	$(COMPOSE) exec api npx prisma db seed
 
 .PHONY: assets
 assets: ## Force rebuild of the React production bundle
@@ -66,7 +62,7 @@ assets: ## Force rebuild of the React production bundle
 
 .PHONY: test-api
 test-api: ## Run backend test suite
-	$(COMPOSE) exec api php artisan test
+	$(COMPOSE) exec api npm test
 
 .PHONY: build-assets
 build-assets: ## Build React locally with node (no Docker)
@@ -74,7 +70,7 @@ build-assets: ## Build React locally with node (no Docker)
 
 .PHONY: clean
 clean: ## Remove local node_modules and frontend dist
-	rm -rf frontend/node_modules frontend/dist
+	rm -rf frontend/node_modules frontend/dist api-node/node_modules api-node/dist
 
 .PHONY: smoke
 smoke: ## End-to-end API smoke test (stack must be running)

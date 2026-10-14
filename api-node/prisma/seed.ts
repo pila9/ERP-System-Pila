@@ -6,13 +6,15 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  // Create roles
+  const hashedPassword = await bcrypt.hash('password', 10);
+
+  // Create roles matching README
   const adminRole = await prisma.role.upsert({
-    where: { slug: 'admin' },
+    where: { slug: 'administrator' },
     update: {},
     create: {
       name: 'Administrator',
-      slug: 'admin',
+      slug: 'administrator',
       description: 'Full system access',
       permissions: ['*'],
       isSystem: true,
@@ -20,43 +22,102 @@ async function main() {
   });
 
   const managerRole = await prisma.role.upsert({
-    where: { slug: 'manager' },
+    where: { slug: 'general-manager' },
     update: {},
     create: {
-      name: 'Manager',
-      slug: 'manager',
-      description: 'Manage operations',
-      permissions: ['sales:read', 'sales:write', 'purchases:read', 'purchases:write', 'inventory:read', 'inventory:write', 'reports:read'],
+      name: 'General Manager',
+      slug: 'general-manager',
+      description: 'All operations, no user/role admin',
+      permissions: ['sales:read', 'sales:write', 'purchases:read', 'purchases:write', 'inventory:read', 'inventory:write', 'reports:read', 'invoicing:read', 'invoicing:write', 'payments:read', 'payments:write'],
       isSystem: true,
     },
   });
 
-  const userRole = await prisma.role.upsert({
-    where: { slug: 'user' },
+  const salesManagerRole = await prisma.role.upsert({
+    where: { slug: 'sales-manager' },
     update: {},
     create: {
-      name: 'User',
-      slug: 'user',
-      description: 'Basic user access',
-      permissions: ['sales:read', 'purchases:read', 'inventory:read'],
+      name: 'Sales Manager',
+      slug: 'sales-manager',
+      description: 'Customers, sales, invoices, reports',
+      permissions: ['sales:read', 'sales:write', 'customers:read', 'customers:write', 'invoicing:read', 'invoicing:write', 'reports:read'],
       isSystem: true,
     },
   });
 
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@erp.com' },
+  const salesRepRole = await prisma.role.upsert({
+    where: { slug: 'sales-representative' },
     update: {},
     create: {
-      code: 'ADM001',
-      name: 'Admin User',
-      email: 'admin@erp.com',
-      password: hashedPassword,
-      roleId: adminRole.id,
-      isActive: true,
+      name: 'Sales Representative',
+      slug: 'sales-representative',
+      description: 'Create and confirm own orders',
+      permissions: ['sales:read', 'sales:write', 'customers:read'],
+      isSystem: true,
     },
   });
+
+  const warehouseRole = await prisma.role.upsert({
+    where: { slug: 'warehouse' },
+    update: {},
+    create: {
+      name: 'Warehouse / Inventory',
+      slug: 'warehouse',
+      description: 'Warehouses, stock, goods receipts',
+      permissions: ['inventory:read', 'inventory:write', 'purchases:read', 'purchases:write', 'warehouses:read', 'warehouses:write'],
+      isSystem: true,
+    },
+  });
+
+  const accountantRole = await prisma.role.upsert({
+    where: { slug: 'accountant' },
+    update: {},
+    create: {
+      name: 'Accountant',
+      slug: 'accountant',
+      description: 'Invoicing, payments, financial reports',
+      permissions: ['invoicing:read', 'invoicing:write', 'payments:read', 'payments:write', 'reports:read', 'customers:read'],
+      isSystem: true,
+    },
+  });
+
+  const viewerRole = await prisma.role.upsert({
+    where: { slug: 'viewer' },
+    update: {},
+    create: {
+      name: 'Viewer / Auditor',
+      slug: 'viewer',
+      description: 'Read-only access',
+      permissions: ['sales:read', 'purchases:read', 'inventory:read', 'reports:read', 'customers:read', 'invoicing:read'],
+      isSystem: true,
+    },
+  });
+
+  // Create demo users matching README
+  const users = [
+    { email: 'admin@erp.test', name: 'Admin User', code: 'ADM001', roleId: adminRole.id },
+    { email: 'manager@erp.test', name: 'General Manager', code: 'MGR001', roleId: managerRole.id },
+    { email: 'sales@erp.test', name: 'Sales Manager', code: 'SAL001', roleId: salesManagerRole.id },
+    { email: 'rep@erp.test', name: 'Sales Representative', code: 'REP001', roleId: salesRepRole.id },
+    { email: 'warehouse@erp.test', name: 'Warehouse Staff', code: 'WHS001', roleId: warehouseRole.id },
+    { email: 'accountant@erp.test', name: 'Accountant', code: 'ACC001', roleId: accountantRole.id },
+    { email: 'viewer@erp.test', name: 'Viewer', code: 'VIE001', roleId: viewerRole.id },
+  ];
+
+  for (const user of users) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: {
+        code: user.code,
+        name: user.name,
+        email: user.email,
+        password: hashedPassword,
+        roleId: user.roleId,
+        isActive: true,
+      },
+    });
+  }
 
   // Create default warehouse
   const warehouse = await prisma.warehouse.upsert({

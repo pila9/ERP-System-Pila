@@ -3,6 +3,7 @@ import { getDashboardOverview, getSalesChart, getTopProducts, getTopCustomers } 
 
 const router = Router();
 
+router.get('/', getDashboardOverview);
 router.get('/overview', getDashboardOverview);
 router.get('/sales-chart', getSalesChart);
 router.get('/top-products', getTopProducts);

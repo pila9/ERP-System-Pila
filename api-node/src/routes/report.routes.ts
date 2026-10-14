@@ -4,6 +4,7 @@ import { getSalesReport, getPurchaseReport, getInventoryReport, getReceivablesRe
 const router = Router();
 
 router.get('/sales', getSalesReport);
+router.get('/sales-summary', getSalesReport);
 router.get('/purchases', getPurchaseReport);
 router.get('/inventory', getInventoryReport);
 router.get('/receivables', getReceivablesReport);

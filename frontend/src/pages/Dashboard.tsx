@@ -106,7 +106,7 @@ export default function Dashboard() {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography variant="h4" fontWeight={600}>Dashboard</Typography>
-        <Chip label="Live" icon={<Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' />} />} color="success" size="small" variant="outlined" />
+        <Chip label="Live" icon={<Box component="span" sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />} color="success" size="small" variant="outlined" />
       </Box>
 
       <Grid container spacing={3}>

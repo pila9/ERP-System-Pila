@@ -84,32 +84,8 @@ const menuItems = [
   { path: '/reports', label: 'Reports', icon: <ReceiptIcon /> },
 ];
 
-export default function Layout() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>(['sales', 'purchasing', 'inventory', 'admin']);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const { showToast } = useToast();
-
-  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
-
-  const handleLogout = () => {
-    logout();
-    handleMenuClose();
-    navigate('/login');
-    showToast('Logged out successfully', 'success');
-  };
-
-  const toggleExpand = (key: string) => {
-    setExpanded(prev => (prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]));
-  };
-
-  const drawer = (
+function DrawerContent({ expanded, toggleExpand, isMobile, navigate }: { expanded: string[]; toggleExpand: (key: string) => void; isMobile: boolean; navigate: (path: string) => void }) {
+  return (
     <Box sx={{ flexGrow: 1, p: 1, overflow: 'auto' }}>
       <Typography variant="h6" sx={{ px: 2, py: 1, fontWeight: 700, color: 'primary.main' }}>
         ERP System
@@ -138,7 +114,7 @@ export default function Layout() {
                       component={NavLink}
                       to={child.path}
                       selected={window.location.pathname === child.path}
-                      onClick={() => isMobile && setMobileOpen(false)}
+                      onClick={() => isMobile && navigate(child.path)}
                       sx={{
                         px: 2,
                         py: 0.5,
@@ -161,7 +137,7 @@ export default function Layout() {
               component={NavLink}
               to={item.path}
               selected={window.location.pathname === item.path}
-              onClick={() => isMobile && setMobileOpen(false)}
+              onClick={() => isMobile && navigate(item.path)}
               sx={{
                 px: 1,
                 py: 0.5,
@@ -177,10 +153,36 @@ export default function Layout() {
       </List>
     </Box>
   );
+}
+
+export default function Layout() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [expanded, setExpanded] = useState<string[]>(['sales', 'purchasing', 'inventory', 'admin']);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { showToast } = useToast();
+
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
+
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
+    navigate('/login');
+    showToast('Logged out successfully', 'success');
+  };
+
+  const toggleExpand = (key: string) => {
+    setExpanded(prev => (prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]));
+  };
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <AppBar position="fixed" sx={{ width: { md: `calc(100% - 260px)` }, ml: { md: '260px' }, zIndex: 1200 }}>
+      <AppBar position="fixed" sx={{ width: { md: 'calc(100% - 260px)' }, ml: { md: '260px' }, zIndex: 1200 }}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -200,52 +202,50 @@ export default function Layout() {
           <IconButton color="inherit" onClick={handleMenuOpen} sx={{ ml: 1 }}>
             <Avatar sx={{ width: 32, height: 32 }}>{user?.name?.[0]?.toUpperCase()}</Avatar>
           </IconButton>
-          </Tooltip>
-          </Toolbar>
-        </AppBar>
+        </Toolbar>
+      </AppBar>
 
-        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} transformOrigin={{ horizontal: 'right', vertical: 'top' }} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
-          <Box sx={{ px: 2, py: 1 }}>
-            <Typography variant="subtitle1" fontWeight={600}>{user?.name}</Typography>
-            <Typography variant="body2" color="text.secondary">{user?.email}</Typography>
-          </Box>
-          <Divider />
-          <MenuItem onClick={() => { handleMenuClose(); navigate('/profile'); }}>
-            <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
-            Profile
-          </MenuItem>
-          <MenuItem onClick={handleLogout}>
-            <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
-            Logout
-          </MenuItem>
-        </Menu>
-
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}
-          sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 } }}
-        >
-          {drawer}
-        </Drawer>
-
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            width: 260,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 260, borderRight: '1px solid', borderColor: 'divider' },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-
-        <Box component="main" sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - 260px)` }, mt: '64px', minHeight: 'calc(100vh - 64px)' }}>
-          <Outlet />
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} transformOrigin={{ horizontal: 'right', vertical: 'top' }} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
+        <Box sx={{ px: 2, py: 1 }}>
+          <Typography variant="subtitle1" fontWeight={600}>{user?.name}</Typography>
+          <Typography variant="body2" color="text.secondary">{user?.email}</Typography>
         </Box>
+        <Divider />
+        <MenuItem onClick={() => { handleMenuClose(); navigate('/profile'); }}>
+          <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
+          Profile
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
+
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+        sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 } }}
+      >
+        <DrawerContent expanded={expanded} toggleExpand={toggleExpand} isMobile={isMobile} navigate={navigate} />
+      </Drawer>
+
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          width: 260,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 260, borderRight: '1px solid', borderColor: 'divider' },
+        }}
+        open
+      >
+        <DrawerContent expanded={expanded} toggleExpand={toggleExpand} isMobile={isMobile} navigate={navigate} />
+      </Drawer>
+
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { md: 'calc(100% - 260px)' }, mt: '64px', minHeight: 'calc(100vh - 64px)' }}>
+        <Outlet />
       </Box>
     </Box>
   );

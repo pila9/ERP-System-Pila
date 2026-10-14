@@ -2,6 +2,9 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+# Install OpenSSL for Prisma (OpenSSL 3 on Alpine 3.22, also provide compat if needed)
+RUN apk add --no-cache openssl
+
 COPY package*.json ./
 RUN npm ci --no-audit --no-fund
 

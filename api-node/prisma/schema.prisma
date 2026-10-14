@@ -79,7 +79,7 @@ model Category {
 model Unit {
   id          String   @id @default(uuid())
   name        String
-  abbreviation String  @db.VarChar(20)
+  abbreviation String  @unique @db.VarChar(20)
   description String?
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")

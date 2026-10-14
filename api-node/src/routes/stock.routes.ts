@@ -7,6 +7,7 @@ router.get('/levels', getStockLevels);
 router.get('/movements', getStockMovements);
 router.post('/movements', createStockMovement);
 router.get('/low-stock', getLowStock);
+router.get('/low', getLowStock);
 router.get('/valuation', getStockValuation);
 
 export default router;

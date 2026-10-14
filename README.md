@@ -1,11 +1,11 @@
 # ERP System
 
-A full-stack ERP built with **React + Tailwind CSS** (SPA), **Laravel 11 + Sanctum** (API) and **MySQL 8**, running entirely in **Docker**.
+A full-stack ERP built with **React + Tailwind CSS** (SPA), **Node.js/Express + Prisma** (API) and **PostgreSQL**, running entirely in **Docker**.
 
 ```
 ┌────────────┐   /api (nginx proxy)   ┌──────────────┐        ┌─────────┐
-│  React SPA │ ────────────────────► │  Laravel API │ ─────► │  MySQL  │
-│  (nginx)   │                       │   php-fpm    │        │    8    │
+│  React SPA │ ────────────────────► │  Node.js API │ ─────► │PostgreSQL │
+│  (nginx)   │                       │   express    │        │         │
 └────────────┘                       └──────────────┘        └─────────┘
 ```
 
@@ -13,7 +13,7 @@ A full-stack ERP built with **React + Tailwind CSS** (SPA), **Laravel 11 + Sanct
 
 | Area | Features |
 |---|---|
-| **Auth & RBAC** | Sanctum token auth, 7 system roles, granular `module.action` permissions, account activation, self-service profile + password |
+| **Auth & RBAC** | JWT token auth, 7 system roles, granular `module.action` permissions, account activation, self-service profile + password |
 | **Dashboard** | Sales/cash KPIs with period-over-period change, 6-month trend, top products, order status split, low-stock, recent orders & payments |
 | **Catalogue** | Products (SKU, barcode, cost/price/tax, reorder level, margin), nested categories, units of measure, warehouses |
 | **Inventory** | Multi-warehouse stock levels, full movement audit trail, manual adjustments, inter-warehouse transfers, low-stock alerts |
@@ -67,9 +67,11 @@ Sign in as a non-admin to see the permission system hide menus, buttons and page
 | `make down` | Stop containers (keeps the database volume) |
 | `make destroy` | Stop containers **and delete all data** |
 | `make logs` / `make api-logs` | Tail logs |
-| `make migrate` / `make migrate-fresh` / `make seed` | Database operations |
+| `make migrate` | Run database migrations |
+| `make migrate-fresh` | Drop all tables, re-migrate and re-seed demo data |
+| `make seed` | Seed demo data |
 | `make shell` | Bash shell inside the API container |
-| `make artisan ARGS="migrate:fresh --seed"` | Run any artisan command |
+| `make test-api` | Run backend test suite |
 | `make assets` | Force rebuild of the React production bundle |
 | `make build-assets` | Build the frontend locally with Node (no Docker) |
 | `make smoke` | Run the end-to-end API smoke test against the running stack |
@@ -78,24 +80,24 @@ Sign in as a non-admin to see the permission system hide menus, buttons and page
 
 ```
 ERP-systems/
-├── docker-compose.yml       # db (mysql:8) + api (php-fpm) + assets + web (nginx) + vite (dev profile)
+├── docker-compose.yml       # db (postgres:16) + api (node:22) + assets + web (nginx) + vite (dev profile)
 ├── Makefile
 ├── docs/API.md              # complete REST API contract
 ├── docker/nginx/default.conf
-├── backend/                 # Laravel 11 API
-│   ├── Dockerfile           # bakes the official skeleton + composer deps, then overlays app code
-│   ├── composer.json
-│   ├── bootstrap/app.php    # routing, middleware aliases, JSON exception rendering
-│   ├── config/erp.php       # currency, tax, sequences, stock rules
-│   ├── app/
-│   │   ├── Http/Controllers/Api/     # one controller per module
-│   │   ├── Http/Middleware/          # EnsurePermission, EnsureRole, EnsureUserIsActive
-│   │   ├── Http/Resources/           # JSON presenters
-│   │   ├── Models/                   # 16 models + document-total concerns
-│   │   ├── Services/                 # Inventory, SalesOrder, Invoice, PurchaseOrder
-│   │   └── Support/                  # NumberGenerator (locked sequences), Money, Perm, ApiException
-│   ├── database/migrations/  # 12 migrations
-│   └── database/seeders/     # roles, users, catalogue, partners, 90 days of transactions
+├── api-node/                # Node.js/Express API
+│   ├── Dockerfile           # installs node deps, builds TS, runs prisma
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── src/
+│   │   ├── controllers/     # one controller per module
+│   │   ├── middleware/      # auth, validation, error handling
+│   │   ├── services/        # business logic layer
+│   │   ├── routes/          # route definitions
+│   │   ├── validators/      # input validation schemas
+│   │   └── utils/           # prisma client wrapper
+│   ├── prisma/              # Prisma schema and seed
+│   │   ├── schema.prisma    # database schema
+│   │   └── seed.ts          # demo data seeder
 └── frontend/                # React 18 + Vite + Tailwind
     └── src/
         ├── lib/              # axios client, formatting, status maps, utils
@@ -141,12 +143,12 @@ Copy `.env.example` to `.env` at the repo root to override defaults (only needed
 |---|---|
 | `WEB_PORT` | `8080` |
 | `VITE_PORT` | `5173` (dev profile) |
-| `DB_PORT` | `3307` |
-| `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | `erp` / `erp` / `secret` |
-| `DB_ROOT_PASSWORD` | `root` |
+| `DB_PORT` | `5432` |
+| `POSTGRES_DB` | `erp_db` |
+| `POSTGRES_USER` | `postgres` |
+| `POSTGRES_PASSWORD` | `postgres` |
 
-Backend behaviour knobs live in `backend/.env.example` (`AUTO_MIGRATE`, `AUTO_SEED`,
-`ERP_CURRENCY`, `ERP_TAX_RATE`, `ERP_NEGATIVE_STOCK`, `ERP_INVOICE_DUE_DAYS` …).
+Backend behaviour knobs live in `api-node/.env.example` (`NODE_ENV`, `PORT`, `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL` …).
 
 ## Development workflow
 
@@ -154,9 +156,9 @@ Backend behaviour knobs live in `backend/.env.example` (`AUTO_MIGRATE`, `AUTO_SE
 make dev          # stack + Vite HMR on http://localhost:5173
 ```
 
-Vite proxies `/api` to the `api` container, so the SPA stays same-origin and no CORS setup is
-needed. Edits to `backend/` need a rebuild: `docker compose restart api` (PHP-FPM reloads on
-file change; the image is not re-read unless you rebuild).
+Vite proxies `/api` to the `api-node` container, so the SPA stays same-origin and no CORS setup is
+needed. Edits to `api-node/` are reflected immediately in development (using `tsx watch`), so no rebuild is needed.
+If you are using the built API (in containers built with `docker compose up --build`), you can restart the API container to pick up changes: `docker compose restart api`.
 
 Frontend-only iteration without Docker:
 
@@ -168,7 +170,7 @@ cd frontend && npm install && npm run dev   # needs an API reachable at VITE_API
 
 ```bash
 make migrate-fresh   # drops all tables, re-migrates, re-seeds demo data
-make destroy         # removes containers and the MySQL volume
+make destroy         # removes containers and the PostgreSQL volume
 ```
 
 ## Verification
@@ -189,8 +191,8 @@ over-receipt, unauthenticated access), every report endpoint, and user/role admi
 
 | Symptom | Fix |
 |---|---|
-| `api` restarts, "database not reachable" | MySQL needs more time on first boot; `docker compose logs -f db` and restart with `docker compose up -d` |
-| App shows the API error page | `docker compose logs -f api` — check `backend/.env` matches the compose environment |
+| `api` restarts, "database not reachable" | PostgreSQL needs more time on first boot; `docker compose logs -f db` and restart with `docker compose up -d` |
+| App shows the API error page | `docker compose logs -f api` — check `api-node/.env` matches the compose environment |
 | Blank page after a frontend change | `make assets` to rebuild `frontend/dist`, then hard-reload the browser |
 | Port 8080 already in use | `WEB_PORT=9090 docker compose up -d` or edit `.env` |
 | Want a clean slate | `make destroy && make up` |

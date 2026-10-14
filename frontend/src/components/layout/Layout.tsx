@@ -200,6 +200,7 @@ export default function Layout() {
           <IconButton color="inherit" onClick={handleMenuOpen} sx={{ ml: 1 }}>
             <Avatar sx={{ width: 32, height: 32 }}>{user?.name?.[0]?.toUpperCase()}</Avatar>
           </IconButton>
+          </Tooltip>
           </Toolbar>
         </AppBar>
 

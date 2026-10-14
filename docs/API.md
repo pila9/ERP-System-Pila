@@ -1,7 +1,7 @@
 # ERP API Contract
 
 Base URL: `/api` (relative, so the SPA works same-origin behind nginx).
-Auth: **Sanctum bearer token**. Send `Authorization: Bearer <token>` on every request except login.
+Auth: **JWT bearer token**. Send `Authorization: Bearer <token>` on every request except login.
 
 All list endpoints accept these query params:
 
@@ -14,7 +14,7 @@ All list endpoints accept these query params:
 | `is_active` | `1`/`0` | boolean filter |
 | `sort` + `direction` | string | `asc` / `desc` |
 
-List responses are **Laravel resources**:
+List responses are in a standard format:
 
 ```json
 {
@@ -27,8 +27,7 @@ List responses are **Laravel resources**:
 Feed the whole object into `<Pagination meta={res.meta} links={res.links} onPageChange={setPage} />`.
 
 Single-resource responses: the resource object **with an extra `message` key** when the
-endpoint performs an action (e.g. `SalesOrderResource::make(...)->additional(['message' => ...])`),
-or `{ "message": "..." }` for deletes.
+endpoint performs an action (e.g. returning additional metadata), or `{ "message": "..." }` for deletes.
 
 Errors:
 

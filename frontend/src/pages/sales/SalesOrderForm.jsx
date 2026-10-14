@@ -2,15 +2,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react'
-import { get, post, put } from '../../lib/api'
+import { api } from '../../lib/api'
 import { cn, isoDay, todayISO } from '../../lib/utils'
 import { formatCurrency, formatNumber } from '../../lib/format'
 import { usePermission } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { PageHeader } from '../../components/ui/DataDisplay'
 import { Card, CardBody, CardFooter, CardHeader } from '../../components/ui/Card'
-import Button from '../../components/ui/Button'
-import Alert from '../../components/ui/Alert'
+import { Button } from '../../components/ui/Button'
+import { Alert } from '../../components/ui/Alert'
 import { Checkbox, FormGrid, Input, Select, Textarea } from '../../components/ui/Form'
 import { ErrorState, LoadingState } from '../../components/ui/Feedback'
 
@@ -120,23 +120,23 @@ export default function SalesOrderForm() {
 
   const { data: order, isLoading, isError, error } = useQuery({
     queryKey: ['sales-orders', 'detail', id],
-    queryFn: () => get(`sales-orders/${id}`).then((response) => response.data),
+    queryFn: () => api.get(`sales-orders/${id}`).then((response) => response.data),
     enabled: isEdit,
   })
 
   const { data: customersData } = useQuery({
     queryKey: ['customers', 'all'],
-    queryFn: () => get('customers', { per_page: 100, is_active: 1 }).then((response) => response.data.data),
+    queryFn: () => api.get('customers', { per_page: 100, is_active: 1 }).then((response) => response.data.data),
   })
 
   const { data: warehousesData } = useQuery({
     queryKey: ['warehouses', 'all'],
-    queryFn: () => get('warehouses', { per_page: 100, is_active: 1 }).then((response) => response.data.data),
+    queryFn: () => api.get('warehouses', { per_page: 100, is_active: 1 }).then((response) => response.data.data),
   })
 
   const { data: productsData } = useQuery({
     queryKey: ['products', 'all'],
-    queryFn: () => get('products', { per_page: 100, is_active: 1 }).then((response) => response.data.data),
+    queryFn: () => api.get('products', { per_page: 100, is_active: 1 }).then((response) => response.data.data),
   })
 
   useEffect(() => {
@@ -179,7 +179,7 @@ export default function SalesOrderForm() {
   }
 
   const saveMutation = useMutation({
-    mutationFn: (payload) => (isEdit ? put(`sales-orders/${id}`, payload) : post('sales-orders', payload)),
+    mutationFn: (payload) => (isEdit ? api.put(`sales-orders/${id}`, payload) : api.post('sales-orders', payload)),
     onSuccess: (response) => {
       invalidate()
       toast.success(response?.data?.message || (isEdit ? 'Sales order updated.' : 'Sales order created.'))

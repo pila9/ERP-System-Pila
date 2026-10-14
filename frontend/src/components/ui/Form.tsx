@@ -1,8 +1,14 @@
-import { TextField, Select, MenuItem, FormControl, InputLabel, FormHelperText, Grid, Stack, Controller, useForm, FormProvider, Typography } from '@mui/material';
-import { useForm as useRHF, Controller as RHFController } from 'react-hook-form';
+import { TextField, Select, MenuItem, FormControl, InputLabel, FormHelperText, Grid, Stack, Typography, Checkbox } from '@mui/material';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z, ZodSchema } from 'zod';
 import { Button } from './Button';
+
+export const Input = TextField;
+export const Textarea = TextField;
+export const Select = Select;
+export const Checkbox = Checkbox;
+export const FormGrid = Grid;
 
 interface FormFieldProps {
   name: string;
@@ -68,13 +74,13 @@ interface FormLayoutProps {
   schema: ZodSchema;
   defaultValues?: Record<string, any>;
   onSubmit: (data: any) => void;
-  children: (fields: ReturnType<typeof useRHF>) => React.ReactNode;
+  children: (fields: ReturnType<typeof useForm>) => React.ReactNode;
   submitLabel?: string;
   loading?: boolean;
 }
 
 export function FormLayout({ schema, defaultValues, onSubmit, children, submitLabel = 'Save', loading = false }: FormLayoutProps) {
-  const methods = useRHF({ resolver: zodResolver(schema), defaultValues, mode: 'onChange' });
+  const methods = useForm({ resolver: zodResolver(schema), defaultValues, mode: 'onChange' });
 
   const handleSubmit = methods.handleSubmit(async (data) => {
     try {

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, Controller } from '@mui/material';
+import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField } from '@mui/material';
+import { Controller } from 'react-hook-form';
 import { Add, Edit, Delete, Search, FilterList } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { api } from '../lib/api';
-import { DataDisplay, FilterBar, ConfirmDialog } from '../components/ui';
-import { formatCurrency, formatDate } from '../lib/format';
-import { useToast } from '../context/ToastContext';
-import { orderStatuses } from '../lib/status';
+import { api } from '../../lib/api';
+import { DataDisplay, FilterBar, ConfirmDialog } from '../../components/ui';
+import { formatCurrency, formatDate } from '../../lib/format';
+import { useToast } from '../../context/ToastContext';
+import { orderStatuses } from '../../lib/status';
 
 const salesOrderSchema = z.object({
   customerId: z.string().uuid('Select a customer'),
@@ -62,7 +63,7 @@ export default function SalesOrders() {
   const [warehouses, setWarehouses] = useState<any[]>([]);
   const { showToast } = useToast();
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<SalesOrderForm>({
+  const { register, handleSubmit: handleFormSubmit, reset, setValue, watch, formState: { errors } } = useForm<SalesOrderForm>({
     resolver: zodResolver(salesOrderSchema),
     defaultValues: { items: [{ productId: '', quantity: 1, unitPrice: 0, discount: 0, taxRate: 0 }] },
   });
@@ -183,7 +184,7 @@ export default function SalesOrders() {
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xl" fullWidth sx={{ maxWidth: 900 }}>
         <DialogTitle>{editingOrder ? 'Edit Sales Order' : 'New Sales Order'}</DialogTitle>
-        <form onSubmit={handleSubmit(handleSubmit)}>
+        <form onSubmit={handleFormSubmit(handleSubmit)}>
           <DialogContent sx={{ pt: 0 }}>
             <Box sx={{ p: 2, maxHeight: '75vh', overflow: 'auto' }}>
               <Grid container spacing={2} columns={12}>
@@ -293,4 +294,4 @@ export default function SalesOrders() {
   );
 }
 
-import { IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';import { Controller } from 'react-hook-form';

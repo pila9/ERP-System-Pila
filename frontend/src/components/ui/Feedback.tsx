@@ -1,4 +1,23 @@
-import { Box, Typography, CircularProgress, Skeleton, Alert } from '@mui/material';
+import { Box, Typography, CircularProgress, Skeleton, Alert, Button } from '@mui/material';
+
+export function LoadingState({ message = 'Loading...' }: { message?: string }) {
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 6, gap: 2 }}>
+      <CircularProgress />
+      <Typography color="text.secondary">{message}</Typography>
+    </Box>
+  );
+}
+
+export function ErrorState({ error, onRetry }: { error: string | Error | null; onRetry?: () => void }) {
+  if (!error) return null;
+  return (
+    <Alert severity="error" sx={{ mb: 2 }}>
+      <Typography>{error instanceof Error ? error.message : error}</Typography>
+      {onRetry && <Button size="small" onClick={onRetry} sx={{ ml: 2 }}>Retry</Button>}
+    </Alert>
+  );
+}
 
 interface FeedbackProps {
   loading?: boolean;

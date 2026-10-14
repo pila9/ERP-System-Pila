@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, Controller, IconButton, TreeView, TreeItem } from '@mui/material';
+import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, IconButton, TreeView, TreeItem } from '@mui/material';
+import { Controller } from 'react-hook-form';
 import { Add, Edit, Delete, Search, FilterList, ExpandMore, ChevronRight } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { api } from '../lib/api';
-import { DataDisplay, FilterBar, ConfirmDialog } from '../components/ui';
-import { useToast } from '../context/ToastContext';
+import { api } from '../../lib/api';
+import { DataDisplay, FilterBar, ConfirmDialog } from '../../components/ui';
+import { useToast } from '../../context/ToastContext';
 
 const categorySchema = z.object({
   code: z.string().optional(),
@@ -40,7 +41,7 @@ export default function Categories() {
   const [deleteConfirm, setDeleteConfirm] = useState<Category | null>(null);
   const { showToast } = useToast();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryForm>({
+  const { register, handleSubmit: handleFormSubmit, reset, formState: { errors } } = useForm<CategoryForm>({
     resolver: zodResolver(categorySchema),
   });
 
@@ -104,7 +105,7 @@ export default function Categories() {
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>{editingCategory ? 'Edit Category' : 'New Category'}</DialogTitle>
-        <form onSubmit={handleSubmit(handleSubmit)}>
+        <form onSubmit={handleFormSubmit(handleSubmit)}>
           <DialogContent sx={{ pt: 0 }}>
             <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Grid container spacing={2} columns={12}>
@@ -152,4 +153,4 @@ export default function Categories() {
   );
 }
 
-import { Grid } from '@mui/material';
+import { Grid } from '@mui/material';import { Controller } from 'react-hook-form';

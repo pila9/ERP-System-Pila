@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper } from '@mui/material';
 import { Search, FilterList, Refresh } from '@mui/icons-material';
-import { api } from '../lib/api';
-import { DataDisplay, FilterBar } from '../components/ui';
-import { formatCurrency, formatNumber, formatDate } from '../lib/format';
-import { stockMovementTypes } from '../lib/status';
+import { api } from '../../lib/api';
+import { DataDisplay, FilterBar } from '../../components/ui';
+import { formatCurrency, formatNumber, formatDate } from '../../lib/format';
+import { stockMovementTypes } from '../../lib/status';
 
 export default function StockMovements() {
   const [movements, setMovements] = useState<any[]>([]);

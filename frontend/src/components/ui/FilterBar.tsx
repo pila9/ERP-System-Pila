@@ -1,6 +1,6 @@
-import { TextField, Select, MenuItem, InputLabel, FormControl, Button, Box, Grid, IconButton, Controller, useForm } from '@mui/material';
+import { TextField, Select, MenuItem, InputLabel, FormControl, Button, Box, Grid, IconButton } from '@mui/material';
 import { FilterList, Clear } from '@mui/icons-material';
-import { useForm as useRHF, Controller as RHFController } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -29,7 +29,7 @@ export function FilterBar({ fields, onSearch, onClear, loading = false, defaultV
     }, {} as Record<string, any>)
   );
 
-  const methods = useRHF({ resolver: zodResolver(schema), defaultValues, mode: 'onChange' });
+  const methods = useForm({ resolver: zodResolver(schema), defaultValues, mode: 'onChange' });
 
   const handleSubmit = methods.handleSubmit((data) => {
     const filters = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== '' && v !== undefined));

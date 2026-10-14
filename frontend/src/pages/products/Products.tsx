@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, Controller, IconButton } from '@mui/material';
+import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
+import { Controller } from 'react-hook-form';
 import { Add, Edit, Delete, Search, FilterList } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { api } from '../lib/api';
-import { DataDisplay, FilterBar, ConfirmDialog } from '../components/ui';
-import { formatCurrency, formatDate } from '../lib/format';
-import { useToast } from '../context/ToastContext';
-import { orderStatuses } from '../lib/status';
+import { api } from '../../lib/api';
+import { DataDisplay, FilterBar, ConfirmDialog } from '../../components/ui';
+import { formatCurrency, formatDate } from '../../lib/format';
+import { useToast } from '../../context/ToastContext';
+import { orderStatuses } from '../../lib/status';
 
 const productSchema = z.object({
   code: z.string().min(2, 'Code must be at least 2 characters'),
@@ -60,7 +61,7 @@ export default function Products() {
   const [units, setUnits] = useState<any[]>([]);
   const { showToast } = useToast();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductForm>({
+  const { register, handleSubmit: handleFormSubmit, reset, formState: { errors } } = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
   });
 
@@ -136,7 +137,7 @@ export default function Products() {
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth sx={{ maxWidth: 600 }}>
         <DialogTitle>{editingProduct ? 'Edit Product' : 'New Product'}</DialogTitle>
-        <form onSubmit={handleSubmit(handleSubmit)}>
+        <form onSubmit={handleFormSubmit(handleSubmit)}>
           <DialogContent sx={{ pt: 0 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, maxHeight: '70vh', overflow: 'auto' }}>
               <Grid container spacing={2} columns={12}>

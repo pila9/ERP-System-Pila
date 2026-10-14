@@ -78,3 +78,10 @@ export function useAuth() {
   if (!context) throw new Error('useAuth must be used within AuthProvider');
   return context;
 }
+
+export function usePermission(permission: string) {
+  const { user } = useAuth();
+  if (!user?.role?.permissions) return false;
+  if (user.role.permissions.includes('*')) return true;
+  return user.role.permissions.includes(permission);
+}

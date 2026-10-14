@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Alert } from '@mui/material';
 import { Warning, Refresh } from '@mui/icons-material';
-import { api } from '../lib/api';
-import { DataDisplay } from '../components/ui';
-import { formatNumber, formatCurrency } from '../lib/format';
-import { useToast } from '../context/ToastContext';
+import { api } from '../../lib/api';
+import { DataDisplay } from '../../components/ui';
+import { formatNumber, formatCurrency } from '../../lib/format';
+import { useToast } from '../../context/ToastContext';
 
 export default function LowStock() {
   const [items, setItems] = useState<any[]>([]);

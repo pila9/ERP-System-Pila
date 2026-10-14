@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, Controller, IconButton } from '@mui/material';
+import { Box, Grid, Card, CardContent, Typography, Button, Chip, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
+import { Controller } from 'react-hook-form';
 import { Add, Edit, Delete, Search, FilterList } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { api } from '../lib/api';
-import { DataDisplay, FilterBar, ConfirmDialog } from '../components/ui';
-import { useToast } from '../context/ToastContext';
+import { api } from '../../lib/api';
+import { DataDisplay, FilterBar, ConfirmDialog } from '../../components/ui';
+import { useToast } from '../../context/ToastContext';
 
 const supplierSchema = z.object({
   code: z.string().min(2, 'Code must be at least 2 characters'),
@@ -56,7 +57,7 @@ export default function Suppliers() {
   const [filters, setFilters] = useState<Record<string, any>>({});
   const { showToast } = useToast();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<SupplierForm>({
+  const { register, handleSubmit: handleFormSubmit, reset, formState: { errors } } = useForm<SupplierForm>({
     resolver: zodResolver(supplierSchema),
   });
 
@@ -121,7 +122,7 @@ export default function Suppliers() {
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth sx={{ maxWidth: 600 }}>
         <DialogTitle>{editingSupplier ? 'Edit Supplier' : 'New Supplier'}</DialogTitle>
-        <form onSubmit={handleSubmit(handleSubmit)}>
+        <form onSubmit={handleFormSubmit(handleSubmit)}>
           <DialogContent sx={{ pt: 0 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, maxHeight: '70vh', overflow: 'auto' }}>
               <Grid container spacing={2} columns={12}>
@@ -195,4 +196,4 @@ export default function Suppliers() {
   );
 }
 
-import { Grid, Pagination } from '@mui/material';
+import { Grid, Pagination } from '@mui/material';import { Controller } from 'react-hook-form';

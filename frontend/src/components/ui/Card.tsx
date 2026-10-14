@@ -1,4 +1,4 @@
-import { Card as MuiCard, CardContent, CardHeader, CardActions, CardProps } from '@mui/material';
+import { Card as MuiCard, CardContent, CardHeader as MuiCardHeader, CardActions, CardProps } from '@mui/material';
 import { forwardRef } from 'react';
 
 interface CardPropsExtended extends CardProps {
@@ -13,7 +13,7 @@ export const Card = forwardRef<HTMLDivElement, CardPropsExtended>((props, ref) =
   return (
     <MuiCard ref={ref} {...rest}>
       {(title || action) && (
-        <CardHeader title={title} subheader={subtitle} action={action} />
+        <MuiCardHeader title={title} subheader={subtitle} action={action} />
       )}
       <CardContent>{children}</CardContent>
     </MuiCard>
@@ -21,3 +21,9 @@ export const Card = forwardRef<HTMLDivElement, CardPropsExtended>((props, ref) =
 });
 
 Card.displayName = 'Card';
+
+export const CardHeader = MuiCardHeader;
+export const CardContent = MuiCardHeader; // alias
+export const CardBody = CardContent;
+export const CardFooter = CardActions;
+export const CardActions = CardActions;

@@ -21,6 +21,8 @@ export const invoiceStatuses = {
   cancelled: { label: 'Cancelled', color: 'error' as const },
 } as const;
 
+export const INVOICE_STATUSES = invoiceStatuses;
+
 export const paymentMethods = {
   cash: 'Cash',
   card: 'Card',
@@ -28,6 +30,8 @@ export const paymentMethods = {
   check: 'Check',
   other: 'Other',
 } as const;
+
+export const PAYMENT_METHODS = paymentMethods;
 
 export const stockMovementTypes = {
   in: { label: 'In', color: 'success' as const },

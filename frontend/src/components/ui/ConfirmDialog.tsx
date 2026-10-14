@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogTitle, AlertDialogContent, AlertDialogActions, AlertDialogAction, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -24,15 +24,15 @@ export function ConfirmDialog({
   loading = false,
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog open={open} onClose={onClose}>
-      <AlertDialogTitle>{title}</AlertDialogTitle>
-      <AlertDialogContent>{message}</AlertDialogContent>
-      <AlertDialogActions>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>{message}</DialogContent>
+      <DialogActions>
         <Button onClick={onClose} disabled={loading} variant="outlined">{cancelText}</Button>
-        <AlertDialogAction onClick={onConfirm} autoFocus disabled={loading} color={variant === 'destructive' ? 'error' : 'primary'}>
+        <Button onClick={onConfirm} autoFocus disabled={loading} color={variant === 'destructive' ? 'error' : 'primary'}>
           {loading ? 'Processing...' : confirmText}
-        </AlertDialogAction>
-      </AlertDialogActions>
-    </AlertDialog>
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }

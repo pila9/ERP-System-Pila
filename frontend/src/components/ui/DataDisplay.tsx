@@ -1,7 +1,31 @@
-import { Table, TableHead, TableBody, TableRow, TableCell, TableContainer, Paper, TableSortLabel, Skeleton, IconButton, Tooltip } from '@mui/material';
+import { Table, TableHead, TableBody, TableRow, TableCell, TableContainer, Paper, TableSortLabel, Skeleton, IconButton, Tooltip, Box, Typography, Button } from '@mui/material';
 import { Sort, ChevronLeft, ChevronRight, Download } from '@mui/icons-material';
 import { formatCurrency, formatDate, formatNumber } from '../../lib/format';
 import { Badge } from './Badge';
+
+export function PageHeader({ title, subtitle, actions, breadcrumbs }: { title: string; subtitle?: string; actions?: React.ReactNode; breadcrumbs?: { label: string; href?: string }[] }) {
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+      {breadcrumbs && (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: '0.875rem', color: 'text.secondary' }}>
+          {breadcrumbs.map((crumb, i) => (
+            <Box key={crumb.label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {i > 0 && <span>/</span>}
+              {crumb.href ? <a href={crumb.href} style={{ color: 'inherit', textDecoration: 'none' }}>{crumb.label}</a> : <span>{crumb.label}</span>}
+            </Box>
+          ))}
+        </Box>
+      )}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" fontWeight={600} sx={{ mb: 0.5 }}>{title}</Typography>
+          {subtitle && <Typography variant="body1" color="text.secondary">{subtitle}</Typography>}
+        </Box>
+        {actions && <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>{actions}</Box>}
+      </Box>
+    </Box>
+  );
+}
 
 interface Column<T> {
   field: keyof T | string;

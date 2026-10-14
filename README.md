@@ -196,3 +196,29 @@ over-receipt, unauthenticated access), every report endpoint, and user/role admi
 | Blank page after a frontend change | `make assets` to rebuild `frontend/dist`, then hard-reload the browser |
 | Port 8080 already in use | `WEB_PORT=9090 docker compose up -d` or edit `.env` |
 | Want a clean slate | `make destroy && make up` |
+### Colima + Docker CLI (Apple Silicon)
+
+This project is configured to run with [Colima](https://github.com/abiosoft/colima) and the Docker CLI on Apple Silicon.
+
+Start the VM:
+```bash
+export PATH="/opt/homebrew/bin:$PATH"
+colima start --cpu 4 --memory 6 --disk 80 --mount-type virtiofs --vm-type vz
+```
+
+Verify:
+```bash
+docker version
+docker compose version
+```
+
+Stop the VM:
+```bash
+colima stop
+```
+
+Restart after reboot:
+```bash
+colima start
+docker compose up -d
+```

@@ -63,7 +63,7 @@ export default function SalesOrders() {
   const [warehouses, setWarehouses] = useState<any[]>([]);
   const { showToast } = useToast();
 
-  const { register, handleSubmit: handleFormSubmit, reset, setValue, watch, formState: { errors } } = useForm<SalesOrderForm>({
+  const { control, handleSubmit: handleFormSubmit, reset, setValue, watch, formState: { errors } } = useForm<SalesOrderForm>({
     resolver: zodResolver(salesOrderSchema),
     defaultValues: { items: [{ productId: '', quantity: 1, unitPrice: 0, discount: 0, taxRate: 0 }] },
   });
@@ -190,7 +190,7 @@ export default function SalesOrders() {
               <Grid container spacing={2} columns={12}>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth size="small">
-                    <Controller name="customerId" control={register} render={({ field }) => (
+                    <Controller name="customerId" control={control} render={({ field }) => (
                       <Select native label="Customer*" value={field.value} onChange={field.onChange} error={!!errors.customerId}>
                         <option value="">Select Customer</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
@@ -199,23 +199,23 @@ export default function SalesOrders() {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Controller name="orderDate" control={register} render={({ field }) => <TextField {...field} label="Order Date*" type="date" fullWidth size="small" error={!!errors.orderDate} helperText={errors.orderDate?.message} InputLabelProps={{ shrink: true }} />} />
+                  <Controller name="orderDate" control={control} render={({ field }) => <TextField {...field} label="Order Date*" type="date" fullWidth size="small" error={!!errors.orderDate} helperText={errors.orderDate?.message} InputLabelProps={{ shrink: true }} />} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Controller name="expectedDate" control={register} render={({ field }) => <TextField {...field} label="Expected Date" type="date" fullWidth size="small" InputLabelProps={{ shrink: true }} />} />
+                  <Controller name="expectedDate" control={control} render={({ field }) => <TextField {...field} label="Expected Date" type="date" fullWidth size="small" InputLabelProps={{ shrink: true }} />} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth size="small">
-                    <Controller name="status" control={register} render={({ field }) => (
+                    <Controller name="status" control={control} render={({ field }) => (
                       <Select native value={field.value} onChange={field.onChange} label="Status" fullWidth>
-                        {Object.entries(orderStatuses).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                        {Object.entries(orderStatuses as Record<string, { label: string; color: string }>).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                       </Select>
                     )} />
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth size="small">
-                    <Controller name="discountType" control={register} render={({ field }) => (
+                    <Controller name="discountType" control={control} render={({ field }) => (
                       <Select native value={field.value} onChange={field.onChange} label="Discount Type" fullWidth>
                         <option value="fixed">Fixed</option>
                         <option value="percentage">Percentage</option>
@@ -224,19 +224,19 @@ export default function SalesOrders() {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Controller name="discountValue" control={register} render={({ field }) => <TextField {...field} label="Discount Value" type="number" fullWidth size="small" />} />
+                  <Controller name="discountValue" control={control} render={({ field }) => <TextField {...field} label="Discount Value" type="number" fullWidth size="small" />} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Controller name="shipping" control={register} render={({ field }) => <TextField {...field} label="Shipping" type="number" fullWidth size="small" />} />
+                  <Controller name="shipping" control={control} render={({ field }) => <TextField {...field} label="Shipping" type="number" fullWidth size="small" />} />
                 </Grid>
                 <Grid item xs={12}>
-                  <Controller name="notes" control={register} render={({ field }) => <TextField {...field} label="Notes" fullWidth size="small" multiline rows={2} />} />
+                  <Controller name="notes" control={control} render={({ field }) => <TextField {...field} label="Notes" fullWidth size="small" multiline rows={2} />} />
                 </Grid>
                 <Grid item xs={12}>
-                  <Controller name="terms" control={register} render={({ field }) => <TextField {...field} label="Terms" fullWidth size="small" multiline rows={2} />} />
+                  <Controller name="terms" control={control} render={({ field }) => <TextField {...field} label="Terms" fullWidth size="small" multiline rows={2} />} />
                 </Grid>
                 <Grid item xs={12}>
-                  <Controller name="reference" control={register} render={({ field }) => <TextField {...field} label="Reference" fullWidth size="small" />} />
+                  <Controller name="reference" control={control} render={({ field }) => <TextField {...field} label="Reference" fullWidth size="small" />} />
                 </Grid>
               </Grid>
 
@@ -245,13 +245,13 @@ export default function SalesOrders() {
                 <Button size="small" startIcon={<Add />} onClick={addItem}>Add Item</Button>
               </Box>
 
-              {watch('items').map((item, index) => (
+              {watch('items').map((_, index) => (
                 <Card key={index} sx={{ mb: 1 }}>
                   <CardContent>
                     <Grid container spacing={2} columns={12}>
                       <Grid item xs={12} sm={4}>
                         <FormControl fullWidth size="small">
-                          <Controller name={`items.${index}.productId`} control={register} render={({ field }) => (
+                          <Controller name={`items.${index}.productId`} control={control} render={({ field }) => (
                             <Select native value={field.value} onChange={(e) => handleItemChange(index, 'productId', e.target.value)} label="Product*" fullWidth error={!!errors.items?.[index]?.productId}>
                               <option value="">Select Product</option>
                               {products.map(p => <option key={p.id} value={p.id}>{p.name} ({p.code}) - {p.salePrice}</option>)}
@@ -260,16 +260,16 @@ export default function SalesOrders() {
                         </FormControl>
                       </Grid>
                       <Grid item xs={12} sm={2}>
-                        <Controller name={`items.${index}.quantity`} control={register} render={({ field }) => <TextField {...field} label="Qty*" type="number" fullWidth size="small" onChange={(e) => handleItemChange(index, 'quantity', Number(e.target.value))} />} />
+                        <Controller name={`items.${index}.quantity`} control={control} render={({ field }) => <TextField {...field} label="Qty*" type="number" fullWidth size="small" onChange={(e) => handleItemChange(index, 'quantity', Number(e.target.value))} />} />
                       </Grid>
                       <Grid item xs={12} sm={2}>
-                        <Controller name={`items.${index}.unitPrice`} control={register} render={({ field }) => <TextField {...field} label="Unit Price*" type="number" fullWidth size="small" step="0.01" onChange={(e) => handleItemChange(index, 'unitPrice', Number(e.target.value))} />} />
+                        <Controller name={`items.${index}.unitPrice`} control={control} render={({ field }) => <TextField {...field} label="Unit Price*" type="number" fullWidth size="small" step="0.01" onChange={(e) => handleItemChange(index, 'unitPrice', Number(e.target.value))} />} />
                       </Grid>
                       <Grid item xs={12} sm={2}>
-                        <Controller name={`items.${index}.discount`} control={register} render={({ field }) => <TextField {...field} label="Discount" type="number" fullWidth size="small" step="0.01" onChange={(e) => handleItemChange(index, 'discount', Number(e.target.value))} />} />
+                        <Controller name={`items.${index}.discount`} control={control} render={({ field }) => <TextField {...field} label="Discount" type="number" fullWidth size="small" step="0.01" onChange={(e) => handleItemChange(index, 'discount', Number(e.target.value))} />} />
                       </Grid>
                       <Grid item xs={12} sm={2}>
-                        <Controller name={`items.${index}.taxRate`} control={register} render={({ field }) => <TextField {...field} label="Tax %" type="number" fullWidth size="small" step="0.01" onChange={(e) => handleItemChange(index, 'taxRate', Number(e.target.value))} />} />
+                        <Controller name={`items.${index}.taxRate`} control={control} render={({ field }) => <TextField {...field} label="Tax %" type="number" fullWidth size="small" step="0.01" onChange={(e) => handleItemChange(index, 'taxRate', Number(e.target.value))} />} />
                       </Grid>
                       <Grid item xs={12} sm={2}>
                         <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
